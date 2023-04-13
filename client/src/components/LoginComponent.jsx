@@ -1,14 +1,25 @@
 import React from "react";
-import { useState } from "react";
-import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, TextField, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 const loginSchema = yup.object().shape({
-  username: yup.string().required("required"),
-  password: yup.string().required("required"),
+  username: yup
+    .string()
+    .required("required")
+    .matches(/^[a-zA-Z0-9]+$/, "Username can only contain letters and numbers")
+    .min(4, "Username must be at least 4 characters")
+    .max(20, "Username cannot be more than 20 characters"),
+  password: yup.lazy((value) =>
+    yup
+      .string()
+      .required("required")
+      .notOneOf([yup.ref("username")], "Password cannot contain the username")
+      .min(8, "Password must be at least 8 characters")
+      .max(30, "Password cannot be more than 30 characters")
+  ),
 });
 
 const initialValuesLogin = {
@@ -22,7 +33,9 @@ const LoginComponent = () => {
   const { palette } = useTheme();
 
   const login = (values, onSubmitProps) => {
-    console.log(values, onSubmitProps);
+    let { username, password } = values;
+    username = username.trim();
+    console.log(username, password);
     onSubmitProps.resetForm();
   };
 

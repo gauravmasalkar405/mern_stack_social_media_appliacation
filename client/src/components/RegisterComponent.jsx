@@ -1,40 +1,97 @@
-import React from "react";
-import { useState } from "react";
-import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  TextField,
+  Typography,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import Dropzone from "react-dropzone";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { registerRoute } from "../routes/userRoutes";
+import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
 
+//validation
 const registerSchema = yup.object().shape({
-  username: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
-  location: yup.string().required("required"),
-  occupation: yup.string().required("required"),
-  //   picture: yup.string().required("required"),
+  username: yup
+    .string()
+    .required("Username is required")
+    .min(4, "Username must be at least 4 characters")
+    .max(20, "Username cannot be more than 20 characters")
+    .matches(/^[a-zA-Z0-9]+$/, "Username can only contain letters and numbers"),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Invalid email address"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters")
+    .max(30, "Password cannot be more than 30 characters"),
+  location: yup
+    .string()
+    .required("Location is required")
+    .min(2, "Location must be at least 2 characters")
+    .max(30, "Location cannot be more than 30 characters")
+    .matches(/^[a-zA-Z\s]+$/, "Location can only contain letters and spaces"),
+  occupation: yup
+    .string()
+    .required("Occupation is required")
+    .min(2, "Occupation must be at least 2 characters")
+    .max(30, "Occupation cannot be more than 30 characters")
+    .matches(/^[a-zA-Z\s]+$/, "Occupation can only contain letters and spaces"),
+  profilePic: yup.string().required("Profile picture is required"),
 });
 
+//initial values
 const initialValuesRegister = {
   username: "",
   email: "",
   password: "",
   location: "",
   occupation: "",
-  // picture: "",
+  profilePic: "",
 };
 
-const RegisterComponent = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+const RegisterComponent = (props) => {
+  const [loader, setLoader] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const isTabletScreens = useMediaQuery("(max-width: 992px)");
+
   const { palette } = useTheme();
 
-  const register = (values, onSubmitProps) => {
-    console.log(values, onSubmitProps);
+  const register = async (values, onSubmitProps) => {
+    let { username, email, password, location, occupation, profilePic } =
+      values;
+
+    username = username.trim();
+    email = email.trim();
+    location = location.trim();
+    occupation = occupation.trim();
+
+    const response = await axios.post(registerRoute, {
+      username,
+      email,
+      password,
+      location,
+      occupation,
+    });
+
+    setLoader(false);
+    if (response.data.status === false) setErrorMsg(response.data.msg);
+    if (response.data.status === true) {
+      props.navigateToLoginPage();
+    }
     onSubmitProps.resetForm();
   };
 
   const handleFormSubmit = (values, onSubmitProps) => {
+    setLoader(true);
     register(values, onSubmitProps);
   };
 
@@ -65,6 +122,13 @@ const RegisterComponent = () => {
                 gap: "0.7rem",
               }}
             >
+              {errorMsg && (
+                <Typography
+                  sx={{ color: "#d32f2f", fontSize: "0.6428571428571428rem" }}
+                >
+                  {errorMsg}
+                </Typography>
+              )}
               <TextField
                 label="Username"
                 onBlur={handleBlur}
@@ -109,6 +173,41 @@ const RegisterComponent = () => {
                   sx={{ width: "calc(50% - 0.35rem)" }}
                 />
               </Box>
+              <Box
+                border={`1px solid ${palette.neutral.medium}`}
+                sx={{
+                  borderRadius: "5px",
+                  p: "0.5rem",
+                }}
+              >
+                <Dropzone
+                  acceptedFiles=".jpg,.jpeg,.png"
+                  multiple={false}
+                  onDrop={(acceptedFiles) =>
+                    setFieldValue("profilePic", acceptedFiles[0])
+                  }
+                >
+                  {({ getRootProps, getInputProps }) => (
+                    <Box
+                      {...getRootProps()}
+                      border={`2px dashed ${palette.primary.main}`}
+                      borderRadius="5px"
+                      p="1rem"
+                      sx={{ "&:hover": { cursor: "pointer" } }}
+                    >
+                      <Input {...getInputProps()} />
+                      {!values.profilePic ? (
+                        <p>Add picture here</p>
+                      ) : (
+                        <Box sx={{ display: "flex", gap: "0.7rem" }}>
+                          <Typography>{values.profilePic.name}</Typography>
+                          <EditOutlinedIcon />
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+                </Dropzone>
+              </Box>
               <TextField
                 label="Password"
                 type="password"
@@ -136,7 +235,18 @@ const RegisterComponent = () => {
                 },
               }}
             >
-              Register
+              {loader ? (
+                <CircularProgress
+                  sx={{
+                    color: isTabletScreens
+                      ? `${palette.primary.main}`
+                      : "white",
+                  }}
+                  size={25}
+                />
+              ) : (
+                "Register"
+              )}
             </Button>
           </form>
         )}

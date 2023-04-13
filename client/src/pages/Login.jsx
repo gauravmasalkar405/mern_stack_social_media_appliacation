@@ -8,6 +8,12 @@ const Login = () => {
   const theme = useTheme();
   const isTabletScreens = useMediaQuery("(max-width: 992px)");
   const isMobileScreens = useMediaQuery("(max-width: 480px)");
+
+  //navigate to login page when register successfully
+  const navigateToLoginPage = () => {
+    setIsRegisterPage(false);
+  };
+
   return (
     <Box
       sx={{
@@ -58,7 +64,11 @@ const Login = () => {
         </Typography>
       </Box>
       <Box width={isMobileScreens ? "85vw" : isTabletScreens ? "65vw" : "40vw"}>
-        {isRegisterPage ? <RegisterComponent /> : <LoginComponent />}
+        {isRegisterPage ? (
+          <RegisterComponent navigateToLoginPage={navigateToLoginPage} />
+        ) : (
+          <LoginComponent />
+        )}
       </Box>
       <Box
         width={isMobileScreens ? "85vw" : isTabletScreens ? "65vw" : "40vw"}

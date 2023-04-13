@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       min: 8,
     },
-    isProfilePicSet: {
-      type: Boolean,
-      default: false,
-    },
     profilePic: {
       type: String,
       default: "",

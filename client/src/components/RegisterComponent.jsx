@@ -15,6 +15,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { registerRoute } from "../routes/userRoutes";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
+import { Buffer } from "buffer";
 
 //validation
 const registerSchema = yup.object().shape({
@@ -74,20 +75,47 @@ const RegisterComponent = (props) => {
     location = location.trim();
     occupation = occupation.trim();
 
-    const response = await axios.post(registerRoute, {
-      username,
-      email,
-      password,
-      location,
-      occupation,
-    });
+    const picture = await readAsBase64(profilePic);
 
-    setLoader(false);
-    if (response.data.status === false) setErrorMsg(response.data.msg);
-    if (response.data.status === true) {
-      props.navigateToLoginPage();
+    try {
+      const response = await axios.post(registerRoute, {
+        username,
+        email,
+        password,
+        location,
+        occupation,
+        profilePic: picture,
+      });
+
+      if (response.data.status === false) {
+        setErrorMsg(response.data.msg);
+      } else {
+        props.navigateToLoginPage();
+      }
+    } catch (error) {
+      setErrorMsg(error.message);
+    } finally {
+      setLoader(false);
+      onSubmitProps.resetForm();
     }
-    onSubmitProps.resetForm();
+  };
+
+  const readAsBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const buffer = Buffer.from(reader.result);
+        const base64 = buffer.toString("base64");
+        resolve(base64);
+      };
+
+      reader.onerror = () => {
+        reject(new Error("Failed to read file as base64"));
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   const handleFormSubmit = (values, onSubmitProps) => {
@@ -228,7 +256,7 @@ const RegisterComponent = (props) => {
                 cursor: "pointer",
                 mt: "0.7rem",
                 backgroundColor: `${palette.primary.main}`,
-                color: "white",
+                color: `${palette.background.alt}`,
                 height: "2.8rem",
                 "&:hover": {
                   color: palette.primary.main,

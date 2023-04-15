@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 function App() {
-  const mode = useSelector((state) => state.mode);
+  const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
 
   return (

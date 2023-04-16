@@ -3,7 +3,8 @@ const User = require("../models/userModels");
 
 module.exports.createPost = async (req, res, next) => {
   try {
-    const { userId, description, postPicturePath } = req.body;
+    const { userId, description, postPicPath } = req.body;
+    console.log(req.file.path);
     const user = await User.findById(userId);
     const newPost = await Post.create({
       userId,
@@ -11,14 +12,14 @@ module.exports.createPost = async (req, res, next) => {
       location: user.location,
       description,
       userProfilePic: user.profilePic,
-      postPicturePath,
+      postPicPath,
       likes: {},
       comments: [],
     });
 
     //sending all posts to the user
     const post = await Post.find();
-    return res.status(201).json(post);
+    return res.json({ post, status: true });
   } catch (error) {
     next(error);
     return res.status(409).json({ error: error.message });

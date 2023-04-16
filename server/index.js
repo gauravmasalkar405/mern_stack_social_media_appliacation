@@ -5,8 +5,12 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
 const createPostRoutes = require("./routes/createPostRoutes");
+const path = require("path");
+const { fileURLToPath } = require("url");
 
 const app = express();
+
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 dotenv.config();
 app.use(express.json());

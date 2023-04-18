@@ -4,14 +4,13 @@ const User = require("../models/userModels");
 module.exports.createPost = async (req, res, next) => {
   try {
     const { userId, description, postPicPath } = req.body;
-    console.log(req.file.path);
     const user = await User.findById(userId);
     const newPost = await Post.create({
       userId,
       username: user.username,
       location: user.location,
       description,
-      userProfilePic: user.profilePic,
+      userProfilePic: user.profilePicPath,
       postPicPath,
       likes: {},
       comments: [],
@@ -30,7 +29,7 @@ module.exports.createPost = async (req, res, next) => {
 module.exports.getFeedPosts = async (req, res, next) => {
   try {
     const post = await Post.find();
-    return res.status(200).json(post);
+    return res.json({ status: true, post });
   } catch (error) {
     next(error);
     return res.status(404).json({ error: error.message });
@@ -39,12 +38,12 @@ module.exports.getFeedPosts = async (req, res, next) => {
 
 module.exports.getUserPosts = async (req, res, next) => {
   try {
-    const { userId } = req.params;
-    const posts = Post.findById({ userId });
-    return res.status(200).json(posts);
+    const { userId } = req.body;
+    console.log(userId);
+    const post = await Post.find({ userId });
+    return res.json({ status: true, post });
   } catch (error) {
-    next(error);
-    return res.status(404).json({ error: error.message });
+    res.status(404).json({ message: error.message });
   }
 };
 
@@ -52,6 +51,9 @@ module.exports.likePost = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { userId } = req.body;
+
+    console.log(id);
+    console.log(userId);
 
     const post = await Post.findById(id);
 
@@ -69,6 +71,7 @@ module.exports.likePost = async (req, res, next) => {
       { likes: post.likes },
       { new: true }
     );
+    return res.json({ status: true, updatedPost });
   } catch (error) {
     next(error);
     return res.status(404).json({ error: error.message });

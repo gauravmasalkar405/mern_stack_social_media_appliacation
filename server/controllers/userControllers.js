@@ -7,7 +7,7 @@ module.exports.register = async (req, res, next) => {
       username,
       email,
       password,
-      profilePic,
+      profilePicPath,
       friends,
       location,
       occupation,
@@ -38,7 +38,7 @@ module.exports.register = async (req, res, next) => {
     const user = await User.create({
       username,
       email,
-      profilePic,
+      profilePicPath,
       password: passwordHash,
       friends,
       location,
@@ -49,18 +49,8 @@ module.exports.register = async (req, res, next) => {
 
     return res.json({
       status: true,
-      username: user.username,
-      userId: user._id,
-      email: user.email,
-      profilePic: user.profilePic,
-      friends: user.friends,
-      location: user.location,
-      occupation: user.occupation,
-      viewedProfile: user.viewedProfile,
-      impressions: user.impressions,
     });
   } catch (error) {
-    next(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -94,7 +84,7 @@ module.exports.getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
-    return res.status(404).res.json(user);
+    return res.json({ status: true, user });
   } catch (error) {
     next(error);
     return res.status(404).json({ msg: error.message });
@@ -105,6 +95,7 @@ module.exports.getUser = async (req, res, next) => {
 module.exports.getUserFriends = async (req, res, next) => {
   try {
     const { id } = req.params;
+
     const user = await User.findById(id);
 
     // user.friends stores only id's of friends and we are maping those id and getting all information of all those friends and storing it in friends array
@@ -114,11 +105,11 @@ module.exports.getUserFriends = async (req, res, next) => {
 
     // this will get only required information of friends
     const formattedFriends = friends.map(
-      ({ _id, username, occupation, location, profilePic }) => {
-        return { _id, username, occupation, location, profilePic };
+      ({ _id, username, occupation, location, profilePicPath }) => {
+        return { _id, username, occupation, location, profilePicPath };
       }
     );
-    res.status(200).json(formattedFriends);
+    return res.json({ status: true, formattedFriends });
   } catch (error) {
     next(error);
     return res.status(404).json({ msg: error.message });
@@ -130,6 +121,7 @@ module.exports.getUserFriends = async (req, res, next) => {
 module.exports.addRemoveFreind = async (req, res, next) => {
   try {
     const { id, friendId } = req.params;
+
     const user = await User.findById(id);
     const friend = await User.findById(friendId);
 
@@ -150,12 +142,12 @@ module.exports.addRemoveFreind = async (req, res, next) => {
     );
 
     const formattedFriends = friends.map(
-      ({ _id, username, occupation, location, profilePic }) => {
-        return { _id, username, occupation, location, profilePic };
+      ({ _id, username, occupation, location, profilePicPath }) => {
+        return { _id, username, occupation, location, profilePicPath };
       }
     );
 
-    res.status(200).json(formattedFriends);
+    return res.json({ status: true, formattedFriends });
   } catch (error) {
     next(error);
     return res.status(404).json({ msg: error.message });

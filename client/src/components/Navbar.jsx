@@ -24,11 +24,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ user }) => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.auth.user);
 
   const isDesktopScreens = useMediaQuery("(min-width: 992px)");
   const theme = useTheme();
@@ -132,7 +131,14 @@ const Navbar = () => {
               <MenuItem value={username}>
                 <Typography>{username}</Typography>
               </MenuItem>
-              <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  dispatch(setLogout());
+                  navigate("/");
+                }}
+              >
+                Log Out
+              </MenuItem>
             </Select>
           </FormControl>
         </Box>

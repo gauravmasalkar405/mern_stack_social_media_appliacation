@@ -16,7 +16,7 @@ import twitter from "../../assets/twitter.png";
 const UserWidget = ({ user }) => {
   const {
     username,
-    profilePic,
+    profilePicPath,
     occupation,
     location,
     friends,
@@ -50,7 +50,7 @@ const UserWidget = ({ user }) => {
             gap: "1rem",
           }}
         >
-          <UserImage image={profilePic} />
+          <UserImage image={profilePicPath} />
           <Box>
             <Typography
               fontSize="1rem"

@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { host } from "../routes/userRoutes";
 
 const UserImage = ({ image, size = "60px" }) => {
   return (
@@ -7,7 +8,7 @@ const UserImage = ({ image, size = "60px" }) => {
         style={{ objectFit: "cover", borderRadius: "50%" }}
         width={size}
         height={size}
-        src={`data:image/png;base64,${image}`}
+        src={`${host}/assets/${image}`}
         alt=""
       />
     </Box>

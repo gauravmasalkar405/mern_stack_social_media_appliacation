@@ -6,17 +6,30 @@ const {
   addRemoveFreind,
 } = require("../controllers/userControllers");
 
+const multer = require("multer");
+
 const router = require("express").Router();
 
-router.post("/register", register);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/assets");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+router.post("/register", upload.single("profilePic"), register);
 router.post("/login", login);
 
 // READ
-router.get("/getuser/:id", getUser);
-router.get("/getuserfriends/:id", getUserFriends);
+router.post("/getuser/:id", getUser);
+router.post("/getuserfriends/:id", getUserFriends);
 
 // UPDATE
 // patch method is used to update existing data
-router.patch("/addremovefriend/friendId/:id", addRemoveFreind);
+router.patch("/addremovefriend/:id/:friendId", addRemoveFreind);
 
 module.exports = router;

@@ -15,7 +15,6 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { registerRoute } from "../routes/userRoutes";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Buffer } from "buffer";
 
 //validation
 const registerSchema = yup.object().shape({
@@ -75,18 +74,17 @@ const RegisterComponent = (props) => {
     location = location.trim();
     occupation = occupation.trim();
 
-    const picture = await readAsBase64(profilePic);
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("location", location);
+    formData.append("occupation", occupation);
+    formData.append("profilePic", profilePic);
+    formData.append("profilePicPath", profilePic.name);
 
     try {
-      const response = await axios.post(registerRoute, {
-        username,
-        email,
-        password,
-        location,
-        occupation,
-        profilePic: picture,
-      });
-
+      const response = await axios.post(registerRoute, formData);
       if (response.data.status === false) {
         setErrorMsg(response.data.msg);
       } else {
@@ -98,24 +96,6 @@ const RegisterComponent = (props) => {
       setLoader(false);
       onSubmitProps.resetForm();
     }
-  };
-
-  const readAsBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const buffer = Buffer.from(reader.result);
-        const base64 = buffer.toString("base64");
-        resolve(base64);
-      };
-
-      reader.onerror = () => {
-        reject(new Error("Failed to read file as base64"));
-      };
-
-      reader.readAsArrayBuffer(file);
-    });
   };
 
   const handleFormSubmit = (values, onSubmitProps) => {

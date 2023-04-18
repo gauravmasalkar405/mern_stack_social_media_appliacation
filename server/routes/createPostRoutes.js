@@ -4,6 +4,7 @@ const {
   getUserPosts,
   likePost,
 } = require("../controllers/postControllers");
+
 const multer = require("multer");
 
 const router = require("express").Router();
@@ -21,11 +22,10 @@ const upload = multer({ storage });
 
 router.post("/createpost", upload.single("postPic"), createPost);
 
-//READ
-router.get("/getFeedPosts", getFeedPosts);
-router.get("/getUserPosts/:id", getUserPosts);
+router.post("/getfeedposts", getFeedPosts);
+router.post("/getuserposts", getUserPosts);
 
 //UPDATE
-router.patch("/likePost", likePost);
+router.patch("/likepost/:id", likePost);
 
 module.exports = router;

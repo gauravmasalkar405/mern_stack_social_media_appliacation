@@ -64,6 +64,12 @@ const LoginComponent = () => {
             user: loggedInUser.data.userFound,
           })
         );
+
+        //also storing in local storage
+        localStorage.setItem(
+          "loggedInUser",
+          JSON.stringify(loggedInUser.data.userFound)
+        );
         navigate("/home");
       }
     } catch (error) {

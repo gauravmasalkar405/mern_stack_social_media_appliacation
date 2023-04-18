@@ -25,15 +25,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../../features/authSlice";
 import axios from "axios";
 import { createPost } from "../../routes/postRoutes";
-import UserMulter from "../../styles/UserMulter";
-import { errorMonitor } from "events";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const MakePostWidget = ({ user }) => {
-  const { profilePic, _id } = user;
+  const { profilePicPath, _id } = user;
   const [postDescription, setPostDescription] = useState("");
   const [isImageIconClicked, setIsImageIconClicked] = useState(false);
   const [image, setImage] = useState(null);
-  const [dp, setDp] = useState(null);
+  const [isLoader, setIsLoader] = useState(false);
   const dispatch = useDispatch();
   const theme = useTheme();
   const isDesktopScreens = useMediaQuery("(min-width: 992px)");
@@ -41,6 +40,7 @@ const MakePostWidget = ({ user }) => {
   const medium = theme.palette.neutral.medium;
 
   const handlePost = async () => {
+    setIsLoader(true);
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", postDescription);
@@ -49,9 +49,13 @@ const MakePostWidget = ({ user }) => {
 
     try {
       const response = await axios.post(createPost, formData);
-      setDp(response.data.post[0].postPicPath);
+      if (response.data.status) {
+        const posts = response.data.post;
+        dispatch(setPosts({ posts }));
+      }
       setImage(null);
       setPostDescription("");
+      setIsLoader(false);
     } catch (error) {
       console.log(error);
     }
@@ -59,9 +63,6 @@ const MakePostWidget = ({ user }) => {
 
   return (
     <WidgetWrapper>
-      {/* {dp && <img src={`http://localhost:5000/assets/${dp}`} alt="image"></img>}
-      {dp && <p>{dp}</p>} */}
-      {dp && <UserMulter image={dp} />}
       <Box
         sx={{
           display: "flex",
@@ -71,7 +72,7 @@ const MakePostWidget = ({ user }) => {
           width: "100%",
         }}
       >
-        <UserImage image={profilePic} />
+        <UserImage image={profilePicPath} />
         <InputBase
           placeholder="What's on your mind..."
           onChange={(e) => setPostDescription(e.target.value)}
@@ -231,7 +232,18 @@ const MakePostWidget = ({ user }) => {
             },
           }}
         >
-          POST
+          {isLoader ? (
+            <CircularProgress
+              sx={{
+                color: isDesktopScreens
+                  ? "white"
+                  : `${theme.palette.primary.main}`,
+              }}
+              size={18}
+            />
+          ) : (
+            "POST"
+          )}
         </Button>
       </Box>
     </WidgetWrapper>

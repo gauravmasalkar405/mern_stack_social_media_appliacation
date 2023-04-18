@@ -6,13 +6,16 @@ import { useSelector } from "react-redux";
 import { UseMediaQuery } from "@mui/material";
 import MakePostWidget from "../components/widgets/MakePostWidget";
 import AdvertWidget from "../components/widgets/AdvertWidget";
+import AllPostsWidget from "../components/widgets/AllPostsWidget";
+import { Directions } from "@mui/icons-material";
+import FriendListWidget from "../components/widgets/FriendListWidget";
 
 const Home = () => {
   const isTabletScreens = useMediaQuery("(max-width: 992px)");
   const user = useSelector((state) => state.auth.user);
   return (
     <Box>
-      <Navbar />
+      <Navbar user={user} />
       <Box
         sx={{
           display: isTabletScreens ? "block" : "flex",
@@ -32,11 +35,14 @@ const Home = () => {
         </Box>
         <Box
           sx={{
+            display: "flex",
+            flexDirection: "column",
             width: isTabletScreens ? "auto" : "49%",
             mb: "1rem",
           }}
         >
           <MakePostWidget user={user} />
+          <AllPostsWidget user={user} />
         </Box>
         <Box
           sx={{
@@ -44,7 +50,7 @@ const Home = () => {
             mb: "1rem",
           }}
         >
-          <AdvertWidget />
+          {!isTabletScreens && <FriendListWidget userId={user._id} />}
         </Box>
       </Box>
     </Box>

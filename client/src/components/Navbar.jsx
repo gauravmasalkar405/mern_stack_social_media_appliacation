@@ -24,10 +24,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ user }) => {
+const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
 
   const isDesktopScreens = useMediaQuery("(min-width: 992px)");
   const theme = useTheme();

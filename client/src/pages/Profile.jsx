@@ -15,7 +15,6 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const isDesktopScreens = useMediaQuery("(min-width:992px)");
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
   const getUserData = async () => {
     try {
@@ -32,58 +31,60 @@ const Profile = () => {
     getUserData();
   }, []);
 
-  class ErrorBoundary extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = { hasError: false };
-    }
-
-    componentDidCatch(error, errorInfo) {
-      // You can log the error here
-      console.log(error, errorInfo);
-      this.setState({ hasError: true });
-    }
-
-    render() {
-      if (this.state.hasError) {
-        // You can render a fallback UI here
-        return <h1>Something went wrong.</h1>;
-      }
-
-      return this.props.children;
-    }
-  }
-
   return (
     user && (
       <Box>
-        <Navbar user={loggedInUser} />
-        <Box
-          width="100%"
-          padding="2rem 6%"
-          display={isDesktopScreens ? "flex" : "block"}
-          gap="2rem"
-          justifyContent="center"
-        >
-          <Box flexBasis={isDesktopScreens ? "26%" : undefined}>
-            <UserWidget user={user} />
-            <Box m="2rem 0" />
+        <Navbar />
 
-            <ErrorBoundary>
-              <FriendListWidget userId={userId} />
-            </ErrorBoundary>
+        <Box
+          sx={{
+            display: !isDesktopScreens ? "block" : "flex",
+            width: "100%",
+            padding: "2rem",
+            gap: "0.5rem",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box
+            sx={{
+              width: !isDesktopScreens ? "auto" : "23%",
+              mb: "1rem",
+            }}
+          >
+            <UserWidget user={user} />
           </Box>
           <Box
-            flexBasis={isDesktopScreens ? "42%" : undefined}
-            mt={isDesktopScreens ? undefined : "2rem"}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: !isDesktopScreens ? "auto" : "49%",
+              mb: "1rem",
+            }}
           >
             <MakePostWidget user={user} />
-            <Box m="2rem 0" />
+            {!isDesktopScreens && (
+              <Box
+                sx={{
+                  width: !isDesktopScreens ? "auto" : "23%",
+                  mt: "1rem",
+                }}
+              >
+                <FriendListWidget userId={userId} />
+              </Box>
+            )}
 
-            <ErrorBoundary>
-              <AllPostWidget user={user} isProfile />
-            </ErrorBoundary>
+            <AllPostWidget user={user} isProfile />
           </Box>
+          {isDesktopScreens && (
+            <Box
+              sx={{
+                width: !isDesktopScreens ? "auto" : "23%",
+                mb: "1rem",
+              }}
+            >
+              <FriendListWidget userId={userId} />
+            </Box>
+          )}
         </Box>
       </Box>
     )

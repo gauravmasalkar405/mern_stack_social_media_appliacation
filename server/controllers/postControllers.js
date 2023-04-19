@@ -39,7 +39,6 @@ module.exports.getFeedPosts = async (req, res, next) => {
 module.exports.getUserPosts = async (req, res, next) => {
   try {
     const { userId } = req.body;
-    console.log(userId);
     const post = await Post.find({ userId });
     return res.json({ status: true, post });
   } catch (error) {
@@ -51,9 +50,6 @@ module.exports.likePost = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { userId } = req.body;
-
-    console.log(id);
-    console.log(userId);
 
     const post = await Post.findById(id);
 

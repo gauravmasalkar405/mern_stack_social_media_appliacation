@@ -17,10 +17,6 @@ const FriendListWidget = ({ userId }) => {
       const response = await axios.post(`${getUserFriends}/${userId}`);
       if (response.data.status) {
         dispatch(setFriends({ friends: response.data.formattedFriends }));
-        localStorage.setItem(
-          "friends",
-          JSON.stringify(response.data.formattedFriends)
-        );
       }
     } catch (error) {
       console.log(error);

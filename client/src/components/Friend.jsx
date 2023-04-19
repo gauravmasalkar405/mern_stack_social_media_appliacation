@@ -11,9 +11,7 @@ import axios from "axios";
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const { _id } = useSelector((state) => state.auth.user);
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  const _id = loggedInUser._id;
+  const { _id } = useSelector((state) => state.auth.user);
   const friends = useSelector((state) => state.auth.user.friends);
 
   const { palette } = useTheme();

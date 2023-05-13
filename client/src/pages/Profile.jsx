@@ -2,7 +2,6 @@ import React from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import FriendListWidget from "../components/widgets/FriendListWidget";
 import MakePostWidget from "../components/widgets/MakePostWidget";
@@ -13,17 +12,20 @@ import axios from "axios";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
-  const { userId } = useParams();
+
+  const userId = useSelector((state) => state.auth.friendId);
   const isDesktopScreens = useMediaQuery("(min-width:992px)");
 
   const getUserData = async () => {
-    try {
-      const response = await axios.post(`${getUser}/${userId}`);
-      if (response.data.status) {
-        setUser(response.data.user);
+    if (userId !== undefined) {
+      try {
+        const response = await axios.post(`${getUser}/${userId}`);
+        if (response.data.status) {
+          setUser(response.data.user);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -35,7 +37,6 @@ const Profile = () => {
     user && (
       <Box>
         <Navbar />
-
         <Box
           sx={{
             display: !isDesktopScreens ? "block" : "flex",

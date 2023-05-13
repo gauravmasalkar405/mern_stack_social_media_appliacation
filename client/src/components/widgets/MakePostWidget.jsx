@@ -41,6 +41,7 @@ const MakePostWidget = ({ user }) => {
 
   const handlePost = async () => {
     setIsLoader(true);
+
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", postDescription);

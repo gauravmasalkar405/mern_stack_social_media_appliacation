@@ -6,17 +6,16 @@ const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
 const createPostRoutes = require("./routes/createPostRoutes");
 const path = require("path");
-const { fileURLToPath } = require("url");
 
 const app = express();
 
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
+app.use(cors());
 dotenv.config();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 
 // login and register routes
 app.use("/api/auth", userRoutes);

@@ -1,3 +1,5 @@
+// export const host = "https://social-media-app-backend-t3ki.onrender.com";
+
 export const host = "http://localhost:5000";
 
 export const registerRoute = `${host}/api/auth/register`;

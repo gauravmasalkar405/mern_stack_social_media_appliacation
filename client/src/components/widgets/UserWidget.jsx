@@ -8,7 +8,8 @@ import {
 import { Box, Typography, useTheme, Divider } from "@mui/material";
 import UserImage from "../../styles/UserImage";
 import WidgetWrapper from "../../styles/WidgetWrapper";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setFriendId } from "../../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import linkedin from "../../assets/linkedin.png";
 import twitter from "../../assets/twitter.png";
@@ -29,6 +30,7 @@ const UserWidget = ({ user }) => {
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
+  const dispatch = useDispatch();
 
   return (
     <WidgetWrapper>
@@ -40,7 +42,10 @@ const UserWidget = ({ user }) => {
           gap: "0.5rem",
           pb: "1.1rem",
         }}
-        onClick={() => navigate(`/profile/${_id}`)}
+        onClick={() => {
+          dispatch(setFriendId({ friendId: _id }));
+          navigate(`/profile`);
+        }}
       >
         <Box
           sx={{

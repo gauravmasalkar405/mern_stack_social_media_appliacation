@@ -1,19 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ChatBubbleOutlineOutlined,
-  Description,
   FavoriteBorderOutlined,
   FavoriteOutlined,
   ShareOutlined,
 } from "@mui/icons-material";
-import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputBase,
+  Typography,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import Friend from "../Friend";
 import WidgetWrapper from "../../styles/WidgetWrapper";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "../../features/authSlice";
 import { host } from "../../routes/userRoutes";
-import { likePosts } from "../../routes/postRoutes";
+import { likePosts, makeComment } from "../../routes/postRoutes";
 import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const PostWidget = ({
   _id,
@@ -27,12 +35,18 @@ const PostWidget = ({
   comments,
 }) => {
   const [isComments, setIsComments] = useState(false);
+  const [userComment, setUserComment] = useState("");
+  const [showComments, setShowComments] = useState(comments);
+  const [isLoader, setIsLoader] = useState(false);
   const dispatch = useDispatch();
   const loggedInUserId = useSelector((state) => state.auth.user._id);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const { palette } = useTheme();
   const main = palette.neutral.main;
+  const user = useSelector((state) => state.auth.user);
+  const theme = useTheme();
+  const isDesktopScreens = useMediaQuery("(min-width: 992px)");
 
   const getlikes = async () => {
     try {
@@ -47,9 +61,31 @@ const PostWidget = ({
     }
   };
 
+  // making an comment
+  const handleCommentPost = async () => {
+    setIsLoader(true);
+    try {
+      const response = await axios.post(makeComment, {
+        loggedUserName: user.username,
+        postId: _id,
+        commentText: userComment,
+      });
+
+      if (response.data.status) {
+        // we will store comment in array and map it
+        setShowComments(response.data.comments);
+      }
+      setIsLoader(false);
+    } catch (error) {
+      console.log(error.message);
+    }
+    setUserComment("");
+  };
+
   return (
     <WidgetWrapper m="2rem 0">
       <Friend
+        postId={_id}
         friendId={userId}
         name={username}
         subtitle={location}
@@ -113,7 +149,7 @@ const PostWidget = ({
             <IconButton onClick={() => setIsComments(!isComments)}>
               <ChatBubbleOutlineOutlined />
             </IconButton>
-            <Typography>{comments.length}</Typography>
+            <Typography>{showComments.length}</Typography>
           </Box>
         </Box>
         <IconButton>
@@ -122,15 +158,63 @@ const PostWidget = ({
       </Box>
       {isComments && (
         <Box mt="0.5rem">
-          {comments.map((comment, i) => (
+          {showComments.map((comment, i) => (
             <Box key={`${username}-${i}`}>
-              <Divider />
               <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-                {comment}
+                <span style={{ fontWeight: "bold", fontSize: "0.95rem" }}>
+                  {`${comment.username} `}
+                </span>
+                <span>{comment.text}</span>
               </Typography>
             </Box>
           ))}
-          <Divider />
+
+          {/* comment input */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "1.5rem",
+              width: "100%",
+            }}
+          >
+            <InputBase
+              placeholder="Make a comment"
+              onChange={(e) => setUserComment(e.target.value)}
+              value={userComment}
+              sx={{
+                backgroundColor: theme.palette.neutral.light,
+                borderRadius: "2rem",
+                padding: "0.2rem 2rem",
+                width: "85%",
+              }}
+            />
+            <Button
+              onClick={() => handleCommentPost()}
+              sx={{
+                color: theme.palette.background.alt,
+                backgroundColor: theme.palette.primary.main,
+                borderRadius: "3rem",
+                "&:hover": {
+                  color: theme.palette.primary.main,
+                },
+              }}
+            >
+              {isLoader ? (
+                <CircularProgress
+                  sx={{
+                    color: isDesktopScreens
+                      ? "white"
+                      : `${theme.palette.primary.main}`,
+                  }}
+                  size={18}
+                />
+              ) : (
+                "POST"
+              )}
+            </Button>
+          </Box>
         </Box>
       )}
     </WidgetWrapper>

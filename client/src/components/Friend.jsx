@@ -3,14 +3,15 @@ import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFriends, setFriendId } from "../features/authSlice";
+import { setFriends, setFriendId, setPosts } from "../features/authSlice";
 import UserImage from "../styles/UserImage";
 import { addRemoveFreind } from "../routes/userRoutes";
+import { deletePost } from "../routes/postRoutes";
 import axios from "axios";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath, postId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isMoreButtonClicked, setIsMoreButtonClicked] = useState(false);
@@ -30,8 +31,9 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     if (friendId === _id) {
       setIsUserPost(true);
     }
-  });
+  }, []);
 
+  // req for adding and removing friend
   const addAndRemoveFriend = async () => {
     try {
       const response = await axios.patch(
@@ -45,8 +47,21 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     }
   };
 
+  // more button
   const handleMoreButton = () => {
     setIsMoreButtonClicked(!isMoreButtonClicked);
+  };
+
+  const deleteUserPost = async () => {
+    try {
+      const response = await axios.post(deletePost, { _id: postId });
+      console.log(response);
+      if (response.data.status) {
+        dispatch(setPosts({ posts: response.data.posts }));
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -108,12 +123,13 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
                 color: `${medium}`,
                 fontSize: "1rem",
                 position: "absolute",
-                p: "0 0.5rem",
-                borderRadius: "5px",
-                top: "40px",
+                p: "0.3rem 0.5rem",
+                borderRadius: "2px",
+                top: "45px",
                 right: "9px",
                 backgroundColor: primaryLight,
               }}
+              onClick={() => deleteUserPost()}
             >
               <Typography>Delete</Typography>
             </IconButton>

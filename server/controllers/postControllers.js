@@ -71,6 +71,60 @@ module.exports.likePost = async (req, res, next) => {
     return res.json({ status: true, updatedPost });
   } catch (error) {
     next(error);
-    return res.status(404).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//delete post
+
+module.exports.deletePost = async (req, res) => {
+  try {
+    const { _id } = req.body;
+
+    console.log(_id);
+
+    const deletePost = await Post.findOneAndDelete({ _id });
+
+    if (!deletePost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const remainingPosts = await Post.find();
+
+    return res.json({
+      status: true,
+      message: "Post deleted successfully",
+      posts: remainingPosts,
+    });
+  } catch (error) {
+    next(error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// comments
+module.exports.makeComment = async (req, res) => {
+  try {
+    const { loggedUserName, commentText, postId } = req.body;
+
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      { $push: { comments: { username: loggedUserName, text: commentText } } },
+      { new: true }
+    );
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const { comments } = post;
+    return res.json({
+      status: true,
+      message: "Comment added successfully",
+      comments,
+    });
+  } catch (error) {
+    next(error);
+    return res.status(500).json({ error: error.message });
   }
 };

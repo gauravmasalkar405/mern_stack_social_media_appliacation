@@ -9,3 +9,7 @@ export const getFeedPosts = `${host}/api/posts/getfeedposts`;
 export const getUserPosts = `${host}/api/posts/getuserposts`;
 
 export const likePosts = `${host}/api/posts/likepost`;
+
+export const deletePost = `${host}/api/posts/deletepost`;
+
+export const makeComment = `${host}/api/posts/makecomment`;

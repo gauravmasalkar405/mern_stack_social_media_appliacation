@@ -21,7 +21,7 @@ import {
 import Dropzone from "react-dropzone";
 import UserImage from "../../styles/UserImage";
 import WidgetWrapper from "../../styles/WidgetWrapper";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch,  } from "react-redux";
 import { setPosts } from "../../features/authSlice";
 import axios from "axios";
 import { createPost } from "../../routes/postRoutes";

@@ -3,6 +3,8 @@ const {
   getFeedPosts,
   getUserPosts,
   likePost,
+  deletePost,
+  makeComment,
 } = require("../controllers/postControllers");
 
 const multer = require("multer");
@@ -27,5 +29,11 @@ router.post("/getuserposts", getUserPosts);
 
 //UPDATE
 router.patch("/likepost/:id", likePost);
+
+//delete post
+router.post("/deletepost", deletePost);
+
+// make comment
+router.post("/makecomment", makeComment);
 
 module.exports = router;

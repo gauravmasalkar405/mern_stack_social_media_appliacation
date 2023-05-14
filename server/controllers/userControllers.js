@@ -126,8 +126,6 @@ module.exports.addRemoveFreind = async (req, res, next) => {
     const friend = await User.findById(friendId);
 
     if (user.friends.includes(friendId)) {
-      //The filter method creates a new array that includes only the elements for which the callback function returns true
-      // This will return the array excluding friendId
       user.friends = user.friends.filter((id) => id != friendId);
     } else {
       user.friends.push(friendId);

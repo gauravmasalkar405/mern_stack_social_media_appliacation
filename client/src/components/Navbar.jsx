@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   IconButton,
@@ -23,9 +23,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "../features/authSlice";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { getAllUsersRoute } from "../routes/userRoutes";
+import SearchQuery from "./SearchQuery";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [userSuggestions, setUserSuggestions] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
@@ -39,6 +45,32 @@ const Navbar = () => {
   const alt = theme.palette.background.alt;
 
   const username = user.username;
+
+  //getting all users
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.post(getAllUsersRoute);
+        if (response.data.status) {
+          const users = response.data.users.map((user) => {
+            return { username: user.username, userId: user._id };
+          });
+          setAllUsers(users);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+
+  // suggesting users according to searchQurry
+  useEffect(() => {
+    const searchUsers = allUsers.filter((user) =>
+      user.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setUserSuggestions(searchUsers);
+    console.log(userSuggestions);
+  }, [searchQuery]);
 
   return (
     <Box
@@ -81,12 +113,44 @@ const Navbar = () => {
               backgroundColor: neutralLight,
               gap: "3rem",
               padding: "0.1rem 1.5rem",
+              position: "relative",
             }}
           >
-            <InputBase placeholder="Search..." />
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
             <IconButton>
               <Search />
             </IconButton>
+
+            {/* user on search */}
+            {searchQuery.length > 1 && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "52px",
+                  left: "0",
+                  backgroundColor: neutralLight,
+                  width: "100%",
+                  zIndex: "2",
+                  borderRadius: "2px",
+                }}
+              >
+                {userSuggestions &&
+                  userSuggestions.map((user) => {
+                    return (
+                      <Box key={user.userId} sx={{ padding: "0.4rem 0.4rem" }}>
+                        <SearchQuery
+                          username={user.username}
+                          userId={user.userId}
+                        />
+                      </Box>
+                    );
+                  })}
+              </Box>
+            )}
           </Box>
         )}
       </Box>

@@ -4,6 +4,7 @@ const {
   getUser,
   getUserFriends,
   addRemoveFreind,
+  getAllUsers,
 } = require("../controllers/userControllers");
 
 const multer = require("multer");
@@ -31,5 +32,8 @@ router.post("/getuserfriends/:id", getUserFriends);
 // UPDATE
 // patch method is used to update existing data
 router.patch("/addremovefriend/:id/:friendId", addRemoveFreind);
+
+//getitng all users
+router.post("/allusers", getAllUsers);
 
 module.exports = router;

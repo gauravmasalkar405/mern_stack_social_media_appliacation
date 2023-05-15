@@ -151,3 +151,18 @@ module.exports.addRemoveFreind = async (req, res, next) => {
     return res.status(404).json({ msg: error.message });
   }
 };
+
+// getting all users
+module.exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    if (users) {
+      return res.json({ status: true, users });
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ status: false, message: "Error retrieving users" });
+  }
+};

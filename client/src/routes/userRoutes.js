@@ -11,3 +11,5 @@ export const getUser = `${host}/api/auth/getuser`;
 export const getUserFriends = `${host}/api/auth/getuserfriends`;
 
 export const addRemoveFreind = `${host}/api/auth/addremovefriend`;
+
+export const getAllUsersRoute = `${host}/api/auth/allusers`;
